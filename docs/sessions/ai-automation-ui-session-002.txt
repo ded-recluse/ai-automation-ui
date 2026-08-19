@@ -1,0 +1,483 @@
+AI AUTOMATION UI — DEVELOPMENT SESSION SUMMARY
+Date: 2026-08-18
+Session: 002
+Status: IN PROGRESS
+
+===============================================================================
+SESSION OBJECTIVE
+===============================================================================
+
+Continue from the verified React + TypeScript baseline established in Session
+001 and begin converting the Vite starter project into the actual application.
+
+This session also clarified the initial product scope and established formal
+project documentation.
+
+===============================================================================
+COMPLETED — PROJECT / GIT VERIFICATION
+===============================================================================
+
+Verified the repository before making additional changes.
+
+Current working branch:
+development
+
+Confirmed:
+- development tracks origin/development
+- working tree was initially clean
+- main and development branches exist
+
+The Vite development server was run in one VS Code terminal while a separate
+terminal was used for Git and other commands.
+
+===============================================================================
+COMPLETED — VITE STARTER CLEANUP
+===============================================================================
+
+Removed the Vite demonstration application and replaced it with a minimal
+application baseline.
+
+Changes included:
+
+- Simplified src/App.tsx
+- Removed Vite demo UI
+- Removed unused React state/demo code
+- Removed Vite/React demo imports
+- Removed demo-specific App.css styling
+- Replaced starter index.css content with a minimal global CSS baseline
+- Removed unused starter assets:
+  - public/favicon.svg
+  - public/icons.svg
+  - src/assets/hero.png
+  - src/assets/react.svg
+  - src/assets/vite.svg
+- Removed the deleted favicon reference from index.html
+- Changed the browser page title to:
+  AI Automation
+
+The application was verified in the browser after these changes.
+
+Production build was also verified successfully with:
+
+npm run build
+
+A Git diff review showed the expected cleanup only.
+
+The cleanup was committed and pushed to the development branch before the
+product-design discussion that followed.
+
+===============================================================================
+PRODUCT DIRECTION ESTABLISHED
+===============================================================================
+
+The original concept was a broader AI automation interface.
+
+The immediate V1 direction is now more specific:
+
+TRADING JOURNAL GENERATOR
+
+Initial supported instruments:
+- MES
+- MGC
+
+The application should automate generation of the daily trading journal using
+the existing trading framework.
+
+Real-time market monitoring, BUY/SELL alerts, SMS notifications, and live
+charting remain possible future capabilities but are deferred.
+
+===============================================================================
+V1 DAILY JOURNAL WORKFLOW
+===============================================================================
+
+Planned normal workflow:
+
+1. Select instrument.
+2. Enter daily market levels.
+3. Upload marked-up charts already prepared for daily trading.
+4. Generate the daily journal.
+5. Review the generated journal.
+6. Add save/export/history functionality later as requirements are defined.
+
+Required daily numerical inputs:
+
+- PDH
+- PDL
+- ONH
+- ONL
+- Settlement
+
+Required chart inputs:
+
+- 15-minute chart
+- 1-hour chart
+- 4-hour chart
+
+The user already marks up these charts for normal daily trading, so V1 should
+use those same screenshots rather than requiring a second chart-preparation
+workflow.
+
+The numerical market levels remain separate structured inputs even when they
+are visible on the chart. They serve as authoritative values rather than
+requiring AI to read precise prices from image pixels.
+
+===============================================================================
+SCREENSHOT / MARKET DATA DECISION
+===============================================================================
+
+Screenshots are useful for V1 because they provide visual context such as:
+
+- Price structure
+- Candles
+- EMA 9 / EMA 21
+- MACD
+- Volume
+- Marked daily levels
+- Higher-timeframe context
+
+Screenshots are not intended to become a permanent technical dependency.
+
+If economical programmatic market data becomes available later, the application
+may obtain the underlying data directly.
+
+Native charts may still be useful in a future version so the user can visually
+validate what the application/rules engine is evaluating.
+
+===============================================================================
+INSTRUMENT CONFIGURATION DECISION
+===============================================================================
+
+MES and MGC should be PRECONFIGURED rather than repeatedly configured by the
+user.
+
+Instrument-specific information should live in configuration/data rather than
+being scattered through journal logic.
+
+Conceptual configuration includes:
+
+- Symbol
+- Name
+- Exchange
+- Tick size
+- Tick value
+- Time zone
+- Session definitions
+- Settlement configuration
+
+Static instrument information must remain separate from daily market data.
+
+Daily market data includes:
+
+- Date
+- PDH
+- PDL
+- ONH
+- ONL
+- Settlement price
+- Chart images
+
+The user should enter the daily Settlement PRICE but should not need to enter
+settlement/session times every morning.
+
+Exact session and settlement definitions must be verified before finalizing the
+instrument configuration.
+
+===============================================================================
+FUTURE ADD-INSTRUMENT DESIGN
+===============================================================================
+
+The application should eventually support additional instruments without
+changing or risking existing MES/MGC behavior.
+
+Conceptual future UI:
+
+[MGC] [MES] [+ Add Instrument]
+
+Adding an instrument should primarily add a new instrument configuration rather
+than require changes to the journal engine.
+
+The Add Instrument UI itself is not part of the immediate V1 implementation.
+
+===============================================================================
+DATA SOURCE ARCHITECTURE
+===============================================================================
+
+The application should own a standardized internal market-data format.
+
+Provider-specific response formats should eventually be translated through an
+adapter.
+
+Conceptual architecture:
+
+External Provider
+        |
+        v
+Provider Adapter
+        |
+        v
+Application Standard Data Format
+        |
+        +--> Journal Engine
+        +--> Rules Engine (future)
+        +--> Chart Engine (future)
+
+This allows a future data provider to be changed without rewriting the rest of
+the application.
+
+Planned data sources:
+
+MANUAL
+- V1 normal source.
+- User enters levels and supplies charts.
+
+MOCK
+- Development/testing source.
+- Provides controlled repeatable scenarios.
+
+LIVE API
+- Future source.
+- Deferred pending market-data feasibility/cost research.
+
+===============================================================================
+APPLICATION MODE DECISION
+===============================================================================
+
+Application Mode and Data Source are separate concepts.
+
+Application Mode:
+- Development
+- Live
+
+Data Source:
+- Manual
+- Mock
+- Live API
+
+Examples:
+
+Development + Mock
+Development + Manual
+Development + Live API
+Live + Manual
+Live + Live API
+
+This allows real provider data to be debugged in Development mode later without
+coupling debugging behavior to the data source.
+
+===============================================================================
+DEVELOPMENT MODE
+===============================================================================
+
+Development mode may eventually expose information such as:
+
+- Loaded instrument configuration
+- Current data source
+- Raw journal request
+- Raw AI response
+- Validation errors
+- API status
+- Detailed errors
+- Mock scenario selection
+- Intermediate/calculated values
+
+Live mode should hide developer/debugging information and show only the normal
+daily-use interface.
+
+===============================================================================
+REAL-TIME MARKET DATA — DEFERRED
+===============================================================================
+
+Real-time futures market data was identified as a major project dependency.
+
+Webull OpenAPI and other providers may require separately licensed futures data.
+The cost and licensing could materially affect whether real-time automation is
+financially worthwhile.
+
+Decision:
+
+DO NOT allow real-time market data to block V1.
+
+Future research remains required for:
+
+- MES availability
+- MGC availability
+- Real-time data
+- Historical data
+- OHLCV/bar intervals
+- Settlement information
+- API access
+- Personal/nonprofessional licensing
+- CME/COMEX fees
+- Monthly cost
+- Reliability
+- Documentation
+- Streaming support
+
+Providers discussed for future investigation include:
+
+- Webull OpenAPI
+- CME data/API services
+- Databento
+- Other futures-data providers
+
+===============================================================================
+FUTURE LIVE CHART / ALERT CONCEPT
+===============================================================================
+
+If financially feasible, a future version may include native marked-up live
+charts with instrument tabs.
+
+Potential chart content:
+
+- Candlesticks
+- EMA 9
+- EMA 21
+- MACD
+- Volume
+- PDH / PDL
+- ONH / ONL
+- Settlement
+- Entry / Stop / Targets
+- Setup/status annotations
+
+Important design principle:
+
+The future chart and future rules engine should consume the SAME underlying
+market data so the user can visually validate the engine's conclusions.
+
+Longer-term alert concept:
+
+Market Data
+    |
+    v
+Rules / Analysis Engine
+    |
+    v
+Setup Validation
+    |
+    +--> BUY Alert
+    +--> SELL Alert
+    |
+    v
+SMS Notification
+
+Automated brokerage order execution is NOT currently part of scope.
+
+The intended future system is alert-only.
+
+===============================================================================
+PROJECT DOCUMENTATION CREATED
+===============================================================================
+
+Formal project documentation was split into separate documents:
+
+docs/
+- ai-automation-ui-SRS.txt
+- ai-automation-ui-SDD.txt
+- ai-automation-ui-development-roadmap.txt
+- ai-automation-ui-v1-architecture-summary.txt
+- sessions/
+
+Session history is being stored under:
+
+docs/sessions/
+
+Session 001 was moved there.
+
+Document purposes:
+
+SRS
+- Defines what the application must do.
+
+SDD
+- Defines how the software is designed.
+
+Development Roadmap
+- Defines development sequence and deferred work.
+
+V1 Architecture Summary
+- Original consolidated planning summary retained for reference.
+
+Session summaries
+- Historical record of work completed and where development stopped.
+
+===============================================================================
+CURRENT GIT STATE / WHERE WE STOPPED
+===============================================================================
+
+Current branch:
+development
+
+The application code cleanup has already been committed and pushed.
+
+A new docs/ directory has now been created inside the Git repository.
+
+At the latest Git status check, docs/ was untracked.
+
+The documentation has NOT yet been staged or committed.
+
+Before the documentation commit, Session 002 needed to be created and added to:
+
+docs/sessions/
+
+After placing this file there, the next Git step is to inspect status and stage
+the complete docs directory.
+
+===============================================================================
+IMMEDIATE NEXT STEPS
+===============================================================================
+
+1. Save this file as:
+
+   docs/sessions/ai-automation-ui-session-002.txt
+
+2. Run:
+
+   git status
+
+3. Stage the documentation:
+
+   git add docs
+
+4. Verify:
+
+   git status
+
+5. Commit the documentation as a focused documentation commit.
+
+Suggested commit message:
+
+   Add project requirements and design documentation
+
+6. Push development branch:
+
+   git push
+
+7. Return to React development.
+
+8. Begin the initial V1 Trading Journal Generator application shell.
+
+===============================================================================
+NEXT DEVELOPMENT OBJECTIVE
+===============================================================================
+
+Build the first real V1 application interface around:
+
+- Instrument selection
+- MES/MGC predefined configuration
+- Daily level inputs
+- 15m / 1h / 4h chart uploads
+- Development / Live application mode concept
+- Manual / Mock data-source concept
+
+Do not implement yet:
+
+- Real-time market-data integration
+- Native live charting
+- BUY/SELL alerts
+- SMS
+- Automated trading
+
+===============================================================================
+END OF SESSION 002
+===============================================================================

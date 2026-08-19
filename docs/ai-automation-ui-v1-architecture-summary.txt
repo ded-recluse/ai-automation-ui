@@ -1,0 +1,614 @@
+AI AUTOMATION UI — V1 PRODUCT / ARCHITECTURE SUMMARY
+Date: 2026-08-18
+Status: PLANNING / DEVELOPMENT
+
+===============================================================================
+PROJECT DIRECTION
+===============================================================================
+
+The immediate project direction is a Trading Journal Generator focused initially
+on MES and MGC.
+
+The original longer-term concept included real-time market monitoring, automated
+BUY/SELL alerts, SMS notifications, and live charting. Those features remain
+possible future goals, but real-time futures market-data cost and licensing are
+a major dependency that must be investigated before committing to that scope.
+
+For now, real-time market integration is deferred to a future TODO.
+
+The V1 application should provide useful daily functionality without requiring
+a paid real-time futures data feed.
+
+
+===============================================================================
+V1 — TRADING JOURNAL GENERATOR
+===============================================================================
+
+Primary workflow:
+
+1. Select an instrument.
+2. Enter the daily market levels.
+3. Upload the marked-up charts already prepared for daily trading.
+4. Generate the daily journal using the existing trading framework.
+5. Review the generated journal.
+6. Save/export the journal as functionality is added.
+
+Initial instruments:
+
+- MGC — Micro Gold Futures
+- MES — Micro E-mini S&P 500 Futures
+
+Initial daily level inputs:
+
+- PDH
+- PDL
+- ONH
+- ONL
+- Settlement
+
+Initial chart inputs:
+
+- 15-minute chart
+- 1-hour chart
+- 4-hour chart
+
+The charts can be the same marked-up charts already created during normal daily
+trading preparation. There is no need to create separate clean screenshots for
+the application.
+
+The numerical PDH, PDL, ONH, ONL, and Settlement values should still be entered
+as structured data even when those levels are visible on the chart. This gives
+the application authoritative numerical values rather than requiring the AI to
+derive precise prices from image pixels.
+
+
+===============================================================================
+SCREENSHOTS / CHARTS
+===============================================================================
+
+Screenshots are a V1 market-context input, not intended to be a permanent
+technical dependency.
+
+They provide visual information including:
+
+- Price structure
+- Candles
+- EMA 9 / EMA 21
+- MACD
+- Volume
+- Marked PDH / PDL
+- Marked ONH / ONL
+- Marked Settlement
+- Higher-timeframe context
+
+Dedicated upload locations should identify the timeframe explicitly:
+
+15 Minute Chart
+1 Hour Chart
+4 Hour Chart
+
+The application should not require the AI to determine which timeframe an
+uploaded screenshot represents.
+
+If economical programmatic market data becomes available later, screenshots may
+become optional or unnecessary for machine analysis. Native charts may still be
+valuable to the user for independent validation.
+
+
+===============================================================================
+INSTRUMENT CONFIGURATION
+===============================================================================
+
+The application should NOT scatter MES- and MGC-specific assumptions throughout
+the journal logic.
+
+Instead, MES and MGC should ship as predefined instrument configurations.
+
+Conceptual instrument configuration:
+
+Instrument
+- Symbol
+- Name
+- Exchange
+- Tick size
+- Tick value
+- Time zone
+- Session definitions
+- Settlement configuration
+- Other instrument-specific properties required by the trading framework
+
+Example conceptual structure:
+
+{
+  "symbol": "MGC",
+  "name": "Micro Gold Futures",
+  "exchange": "COMEX",
+  "tickSize": 0.1,
+  "tickValue": 1.0,
+  "timeZone": "America/Chicago",
+  "sessions": {
+    "...": "instrument-specific session configuration"
+  },
+  "settlement": {
+    "...": "instrument-specific settlement configuration"
+  }
+}
+
+Exact session and settlement values should be verified before finalizing the
+configuration.
+
+Preconfigured is intentionally different from hard-coded.
+
+The journal engine should request information from the selected instrument's
+configuration rather than contain repeated logic such as:
+
+if instrument === "MGC"
+if instrument === "MES"
+
+
+===============================================================================
+STATIC INSTRUMENT DATA VS DAILY MARKET DATA
+===============================================================================
+
+Keep instrument configuration separate from daily market data.
+
+STATIC / INSTRUMENT CONFIGURATION
+
+Examples:
+
+- Symbol
+- Exchange
+- Tick size
+- Tick value
+- Time zone
+- Session definitions
+- Settlement methodology/configuration
+
+DAILY MARKET DATA
+
+Examples:
+
+- Date
+- PDH
+- PDL
+- ONH
+- ONL
+- Settlement price
+- Chart images
+
+Conceptual daily data:
+
+{
+  "instrument": "MGC",
+  "date": "YYYY-MM-DD",
+  "levels": {
+    "pdh": 0,
+    "pdl": 0,
+    "onh": 0,
+    "onl": 0,
+    "settlement": 0
+  }
+}
+
+
+===============================================================================
+SETTLEMENT / SESSION INFORMATION
+===============================================================================
+
+Settlement/session information belongs to the instrument configuration.
+
+The user should NOT need to enter settlement times/session definitions every
+morning.
+
+V1:
+
+- MES and MGC contain predefined session/settlement configuration.
+- User enters the current daily Settlement PRICE.
+- Application uses the selected instrument's stored configuration.
+
+Future:
+
+- An Add Instrument feature can expose the required instrument configuration
+  fields.
+- Reference-data services may eventually populate some configuration
+  automatically.
+- Market-data feeds may provide settlement prices or data from which some daily
+  levels can be derived, depending on the selected provider.
+
+Do not assume every futures instrument has identical sessions or settlement
+procedures.
+
+
+===============================================================================
+ADDING INSTRUMENTS
+===============================================================================
+
+The architecture should allow future instruments to be added without modifying
+or risking existing MES/MGC behavior.
+
+Conceptual UI:
+
+[MGC] [MES] [+ Add Instrument]
+
+Each instrument should operate from its own configuration.
+
+Adding another instrument should mean adding configuration/data, not rewriting
+the journal engine.
+
+The Add Instrument UI does NOT need to be implemented immediately. The
+architecture should simply avoid preventing it.
+
+
+===============================================================================
+DATA SOURCE ABSTRACTION
+===============================================================================
+
+The application should use its own standardized internal market-data format.
+
+The React application and journal engine should NOT depend directly on Webull,
+CME, or another provider's native response structure.
+
+Conceptual architecture:
+
+Provider
+    |
+    v
+Market Data Adapter
+    |
+    v
+Our Standard Internal Format
+    |
+    +--> Journal Engine
+    +--> Rules Engine (future)
+    +--> Chart Engine (future)
+
+This allows the provider to be replaced later without rewriting the rest of the
+application.
+
+Example standardized candle structure:
+
+interface Candle {
+  timestamp: number
+  open: number
+  high: number
+  low: number
+  close: number
+  volume: number
+}
+
+
+===============================================================================
+DATA SOURCES
+===============================================================================
+
+The application should eventually support multiple data-source modes.
+
+Planned conceptual sources:
+
+MANUAL
+- User enters PDH, PDL, ONH, ONL, Settlement.
+- V1 production data source.
+
+MOCK
+- Known test data.
+- Used during development.
+- Allows repeatable testing without API costs.
+- Can represent known historical MGC/MES scenarios.
+
+LIVE API
+- Future market-data provider.
+- Only implemented if a financially and technically suitable provider is found.
+
+The journal engine should consume the same internal data structure regardless
+of the source.
+
+
+===============================================================================
+APPLICATION MODE VS DATA SOURCE
+===============================================================================
+
+Application mode and market-data source are separate concepts.
+
+APPLICATION MODE
+
+- Development
+- Live
+
+DATA SOURCE
+
+- Manual
+- Mock
+- Live API
+
+These must not be represented by one combined flag.
+
+Useful combinations include:
+
+Development + Mock
+- Normal repeatable development/testing.
+
+Development + Manual
+- Test the normal manual workflow while exposing debugging information.
+
+Development + Live API
+- Future debugging of real provider data.
+
+Live + Manual
+- V1 normal daily use.
+
+Live + Live API
+- Possible future automated system.
+
+This separation prevents development tooling from becoming coupled to the
+market-data provider.
+
+
+===============================================================================
+DEVELOPMENT MODE
+===============================================================================
+
+Development mode may expose technical information that is unnecessary during
+normal daily use.
+
+Potential development-only information/features:
+
+- Current instrument configuration
+- Current data source
+- Raw journal request
+- Raw AI response
+- Validation errors
+- API status
+- Market-data source/status
+- Loaded test scenario
+- Calculated/intermediate values
+- Detailed network/API errors
+- Mock-data controls
+- Known test datasets
+
+Development mode should make it easier to verify exactly what the application
+is doing.
+
+
+===============================================================================
+LIVE MODE
+===============================================================================
+
+Live mode should present only information necessary for normal use.
+
+Conceptual V1 interface:
+
+Instrument: MGC
+
+PDH          [________]
+PDL          [________]
+ONH          [________]
+ONL          [________]
+Settlement   [________]
+
+15m Chart    [Upload]
+1h Chart     [Upload]
+4h Chart     [Upload]
+
+[ Generate Journal ]
+
+Developer/debugging information should not clutter this interface.
+
+
+===============================================================================
+MOCK DATA / TESTING
+===============================================================================
+
+Mock data should be treated as an important development capability.
+
+Known historical sessions can eventually be represented as test scenarios.
+
+Benefits:
+
+- Repeatable tests
+- No real-time feed required
+- No market-data API cost during development
+- Same scenario can be tested after code changes
+- Expected journal results can be compared against actual output
+- Known MES/MGC sessions can be used for regression testing
+
+Future historical replay may also be useful when developing the rules engine.
+
+
+===============================================================================
+AI / JOURNAL GENERATION
+===============================================================================
+
+The V1 journal generator should combine:
+
+1. Structured daily market levels
+2. Instrument configuration
+3. Marked-up chart screenshots
+4. Existing trading framework/rules
+
+The AI should not invent new trading criteria during analysis.
+
+The application's goal is to apply the established framework consistently and
+produce the standardized daily journal.
+
+The frontend should eventually communicate with a backend service.
+
+API credentials must NOT be stored in the React/browser application.
+
+
+===============================================================================
+FUTURE NATIVE CHARTING
+===============================================================================
+
+If programmatic market data becomes financially feasible, the application may
+eventually display its own live charts.
+
+Potential features:
+
+- Candlesticks
+- EMA 9
+- EMA 21
+- MACD
+- Volume
+- PDH
+- PDL
+- ONH
+- ONL
+- Settlement
+- Entry
+- Stop
+- Targets
+- Setup/status annotations
+
+Instrument tabs could provide separate chart/workspace views:
+
+[MGC] [MES] [+]
+
+An important future validation principle:
+
+THE CHART AND THE RULES ENGINE SHOULD CONSUME THE SAME UNDERLYING MARKET DATA.
+
+This would allow the user to visually confirm what the rules engine is
+evaluating.
+
+
+===============================================================================
+FUTURE RULES / ALERT AUTOMATION
+===============================================================================
+
+The longer-term concept remains:
+
+Market Data
+    |
+    v
+Rules / Analysis Engine
+    |
+    v
+Setup Validation
+    |
+    +--> BUY Alert
+    +--> SELL Alert
+    |
+    v
+SMS Notification
+
+The intended system is alert-only.
+
+Automated brokerage order execution is NOT currently part of the project scope.
+
+The user remains responsible for deciding whether to place the actual trade.
+
+
+===============================================================================
+REAL-TIME MARKET DATA — DEFERRED TODO
+===============================================================================
+
+Real-time futures market data is a major unresolved dependency.
+
+Do not allow it to block V1 journal-generator development.
+
+Future investigation must determine:
+
+- Available providers
+- MES support
+- MGC support
+- Real-time availability
+- Historical-data availability
+- OHLCV/bar intervals
+- Settlement data availability
+- Programmatic/API access
+- Personal/nonprofessional licensing
+- CME/COMEX data fees
+- Monthly cost
+- Reliability
+- API documentation quality
+- Streaming/WebSocket support if required
+
+Previously investigated possibilities include:
+
+- Webull OpenAPI
+- CME data services/APIs
+- Databento
+- Other futures-data providers still to be researched
+
+The goal is to find the minimum economically viable feed needed for the
+application. Expensive Level 2/order-book/footprint data should not be purchased
+unless the trading framework actually requires it.
+
+
+===============================================================================
+DESIGN PRINCIPLES ESTABLISHED
+===============================================================================
+
+1. V1 is a Trading Journal Generator.
+
+2. MES and MGC are the initial instruments.
+
+3. MES/MGC should be preconfigured rather than repeatedly entered by the user.
+
+4. Instrument-specific configuration must remain isolated from journal logic.
+
+5. Daily market values remain separate from static instrument configuration.
+
+6. User manually enters PDH, PDL, ONH, ONL, and Settlement in V1.
+
+7. User uploads the same marked-up 15m, 1h, and 4h charts already prepared for
+   daily trading.
+
+8. Screenshots are a V1 input method, not necessarily a permanent architecture.
+
+9. Application Mode and Data Source are separate settings.
+
+10. Initial data sources should support Manual and Mock.
+
+11. Live API is a future data source.
+
+12. The application owns a standardized internal market-data format.
+
+13. Provider-specific formats must be translated through adapters.
+
+14. Future instruments should be addable without altering existing instruments.
+
+15. Real-time market data remains a TODO until cost/feasibility is established.
+
+16. Future native charts and rules engines should consume the same underlying
+    market data.
+
+17. Future automation is intended to generate BUY/SELL alerts and SMS
+    notifications, not automatically execute trades.
+
+18. API credentials and secrets must remain outside the React frontend.
+
+
+===============================================================================
+IMMEDIATE DEVELOPMENT DIRECTION
+===============================================================================
+
+Continue React development around the V1 Journal Generator.
+
+Near-term frontend work should focus on:
+
+- Application shell
+- Instrument selection
+- MES/MGC predefined configuration
+- Daily level-entry form
+- 15m/1h/4h chart upload interface
+- Development/Live application mode concept
+- Manual/Mock data-source concept
+- Journal-generation interface
+- Generated-journal display
+
+Do not implement real-time market-data integration yet.
+
+Do not implement BUY/SELL alerts yet.
+
+Do not implement SMS yet.
+
+Do not implement automated trading.
+
+Build V1 incrementally and keep future integrations behind clean interfaces so
+they can be added without rewriting the journal application.
+
+
+===============================================================================
+END OF SUMMARY
+===============================================================================

@@ -1,0 +1,362 @@
+AI AUTOMATION UI
+SOFTWARE DESIGN DOCUMENT (SDD)
+
+Date: 2026-08-18
+Version: 0.1
+Status: Draft
+
+===============================================================================
+1. DESIGN GOAL
+===============================================================================
+
+Build the V1 trading journal generator in a way that supports future market-data
+integration and alert automation without coupling the application to a specific
+data provider.
+
+Initial technology foundation:
+
+- React
+- TypeScript
+- Vite
+- Git
+- GitHub
+
+The application will be developed incrementally.
+
+
+===============================================================================
+2. HIGH-LEVEL V1 DESIGN
+===============================================================================
+
+Conceptual V1 flow:
+
+Instrument Selection
+        |
+        v
+Daily Level Entry
+PDH / PDL / ONH / ONL / Settlement
+        |
+        v
+Chart Upload
+15m / 1h / 4h
+        |
+        v
+Journal Generation
+        |
+        v
+Generated Journal
+        |
+        v
+User Review
+
+
+===============================================================================
+3. INSTRUMENT CONFIGURATION DESIGN
+===============================================================================
+
+Instrument-specific information will be represented as configuration rather
+than scattered conditional logic throughout the application.
+
+Conceptual structure:
+
+{
+  "symbol": "MGC",
+  "name": "Micro Gold Futures",
+  "exchange": "COMEX",
+  "tickSize": 0.1,
+  "tickValue": 1.0,
+  "timeZone": "America/Chicago",
+  "sessions": {
+    "...": "instrument-specific session configuration"
+  },
+  "settlement": {
+    "...": "instrument-specific settlement configuration"
+  }
+}
+
+MES and MGC will initially ship as predefined configurations.
+
+Exact session and settlement definitions must be verified before configuration
+is finalized.
+
+Preconfigured instrument data should not be embedded directly inside journal
+generation logic.
+
+
+===============================================================================
+4. STATIC VS DAILY DATA
+===============================================================================
+
+Static instrument configuration and daily market data will remain separate.
+
+STATIC INSTRUMENT DATA
+
+- Symbol
+- Name
+- Exchange
+- Tick size
+- Tick value
+- Time zone
+- Session definitions
+- Settlement configuration
+
+DAILY MARKET DATA
+
+- Date
+- PDH
+- PDL
+- ONH
+- ONL
+- Settlement price
+- Chart images
+
+Conceptual daily structure:
+
+{
+  "instrument": "MGC",
+  "date": "YYYY-MM-DD",
+  "levels": {
+    "pdh": 0,
+    "pdl": 0,
+    "onh": 0,
+    "onl": 0,
+    "settlement": 0
+  }
+}
+
+
+===============================================================================
+5. DATA SOURCE ABSTRACTION
+===============================================================================
+
+The rest of the application should consume an application-owned standardized
+data format rather than provider-specific formats.
+
+Conceptual future architecture:
+
+External Provider
+        |
+        v
+Provider Adapter
+        |
+        v
+Standard Internal Market Data
+        |
+        +----> Journal Engine
+        |
+        +----> Rules Engine (future)
+        |
+        +----> Chart Engine (future)
+
+A future provider change should primarily require a new/modified adapter rather
+than changes throughout the application.
+
+Conceptual standardized candle:
+
+interface Candle {
+  timestamp: number
+  open: number
+  high: number
+  low: number
+  close: number
+  volume: number
+}
+
+
+===============================================================================
+6. DATA SOURCE DESIGN
+===============================================================================
+
+Supported conceptual data sources:
+
+MANUAL
+- V1 normal data source.
+- User supplies daily market levels and chart images.
+
+MOCK
+- Development/testing source.
+- Supplies controlled known data.
+
+LIVE API
+- Future provider integration.
+- Deferred pending feasibility/cost research.
+
+The journal/rules components should operate on standardized application data
+rather than needing to know which source produced it.
+
+
+===============================================================================
+7. APPLICATION MODE DESIGN
+===============================================================================
+
+Application mode:
+
+- Development
+- Live
+
+Data source:
+
+- Manual
+- Mock
+- Live API
+
+These are independent settings.
+
+Examples:
+
+Development + Mock
+Development + Manual
+Development + Live API
+Live + Manual
+Live + Live API
+
+This permits debugging real provider data in Development mode without coupling
+the provider selection to the application's presentation mode.
+
+
+===============================================================================
+8. DEVELOPMENT MODE DESIGN
+===============================================================================
+
+Development mode may expose a developer panel containing:
+
+- Instrument configuration
+- Selected data source
+- Raw journal request
+- Raw AI response
+- Validation information
+- API connection/status information
+- Detailed errors
+- Mock scenario selection
+- Intermediate values
+
+These controls/information should not clutter the normal Live-mode interface.
+
+
+===============================================================================
+9. CHART INPUT DESIGN — V1
+===============================================================================
+
+V1 uses marked-up screenshots as visual market context.
+
+Dedicated inputs:
+
+- 15-minute chart
+- 1-hour chart
+- 4-hour chart
+
+Screenshots are considered an input mechanism rather than permanent storage or
+a permanent market-data architecture.
+
+The numerical daily levels remain separate structured inputs.
+
+
+===============================================================================
+10. FUTURE CHART DESIGN
+===============================================================================
+
+If programmatic market data becomes viable, native charts may eventually
+display:
+
+- Candlesticks
+- EMA 9
+- EMA 21
+- MACD
+- Volume
+- PDH
+- PDL
+- ONH
+- ONL
+- Settlement
+- Entry
+- Stop
+- Targets
+- Setup/status annotations
+
+Potential workspace:
+
+[MGC] [MES] [+]
+
+A future chart and rules engine should consume the same underlying market data.
+This supports visual validation of the engine's conclusions.
+
+
+===============================================================================
+11. FUTURE INSTRUMENT EXTENSIBILITY
+===============================================================================
+
+The architecture should permit a future Add Instrument function.
+
+Adding an instrument should primarily create/add an instrument configuration.
+
+Existing MGC and MES configurations and behavior should not need to be modified
+when another instrument is introduced.
+
+
+===============================================================================
+12. FUTURE ALERT ARCHITECTURE
+===============================================================================
+
+Conceptual future flow:
+
+Market Data
+    |
+    v
+Rules / Analysis Engine
+    |
+    v
+Setup Validation
+    |
+    +----> BUY Alert
+    |
+    +----> SELL Alert
+    |
+    v
+SMS Notification
+
+Automated order execution is outside current scope.
+
+
+===============================================================================
+13. FRONTEND / BACKEND BOUNDARY
+===============================================================================
+
+React will provide the user interface.
+
+Operations requiring private credentials, including future AI/API calls, should
+be performed through a backend service.
+
+Conceptual structure:
+
+React Frontend
+      |
+      v
+Backend API
+      |
+      +----> AI Service
+      |
+      +----> Future Market Data Provider
+      |
+      +----> Future Notification Service
+
+Secrets must remain outside the browser application.
+
+
+===============================================================================
+14. CORE DESIGN PRINCIPLES
+===============================================================================
+
+- Do not couple journal logic to MES/MGC-specific conditional code.
+- Keep instrument configuration separate from daily data.
+- Keep application mode separate from data source.
+- Use application-owned internal data structures.
+- Translate provider-specific formats through adapters.
+- Preserve Manual data entry as a viable mode.
+- Use Mock data for repeatable development testing.
+- Keep future integrations behind defined boundaries.
+- Do not make real-time market data a prerequisite for V1.
+- Do not introduce functionality that is not required by the current phase.
+
+===============================================================================
+END OF SDD
+===============================================================================

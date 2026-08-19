@@ -1,0 +1,295 @@
+AI AUTOMATION UI — DEVELOPMENT SESSION SUMMARY Date: 2026-08-17 Status:
+IN PROGRESS
+
+===============================================================================
+PROJECT GOAL
+===============================================================================
+
+Build a local and web-based React interface for AI automation.
+
+Development approach: - React + TypeScript - Vite development/build
+tooling - Git for local version control - GitHub for remote source
+control and portfolio visibility - Development will be done
+incrementally, with the user writing/working through the code while
+ChatGPT provides guidance and explanations.
+
+Project name: ai-automation-ui
+
+Local project directory: D:-repos-automation-ui
+
+GitHub repository: ded-recluse / ai-automation-ui
+
+Repository description: React and TypeScript interface for building,
+managing, and interacting with AI-powered automation workflows.
+
+===============================================================================
+COMPLETED — DEVELOPMENT ENVIRONMENT
+===============================================================================
+
+1.  Verified original development tools.
+
+Original versions: - Node.js: v14.15.1 - npm: 6.14.8 - Git:
+2.31.1.windows.1
+
+Node.js was too old for the current Vite toolchain.
+
+2.  Installed NVM for Windows.
+
+Initial NVM installation used: C:Recluse
+
+This caused an activation problem because the Windows user directory
+contains a space.
+
+NVM was reconfigured to use: D:
+
+Node symlink: C:
+
+3.  Installed and activated Node.js through NVM.
+
+Current Node: v24.19.0
+
+Current npm: 11.17.0
+
+NVM: 1.2.2
+
+Node 24.19.0 is now managed through NVM.
+
+===============================================================================
+COMPLETED — REACT PROJECT
+===============================================================================
+
+1.  First Vite scaffold accidentally created the vanilla TypeScript
+    template.
+
+That scaffold was deleted before any application code was written.
+
+2.  Project was recreated explicitly using the React + TypeScript
+    template:
+
+npm create vite@latest ai-automation-ui – –template react-ts
+
+3.  Dependencies installed successfully:
+
+npm install
+
+Result: - 27 packages added - 0 vulnerabilities
+
+4.  Verified React project structure.
+
+Important source files include:
+
+src/ App.tsx main.tsx App.css index.css assets/
+
+5.  Started the Vite development server:
+
+npm run dev
+
+The untouched React starter application successfully loaded in the
+browser.
+
+This established a known-good baseline: Node -> npm -> Vite -> React ->
+TypeScript -> Browser
+
+===============================================================================
+COMPLETED — GIT
+===============================================================================
+
+Git repository initialized locally.
+
+Initial branch: development
+
+A stable main branch was also created.
+
+Current branch structure:
+
+main development
+
+The initial React/Vite scaffold was staged and committed.
+
+Initial commit: 0bfdab6 Initial React Typescript project Setup
+
+The initial commit represents the untouched, verified React + TypeScript
+baseline.
+
+.gitignore was reviewed before committing.
+
+Important ignored/generated content: - node_modules - dist - dist-ssr -
+editor/OS-specific files
+
+Important committed dependency files: - package.json - package-lock.json
+
+===============================================================================
+COMPLETED — GITHUB
+===============================================================================
+
+Created public GitHub repository:
+
+ai-automation-ui
+
+The GitHub repository was intentionally created WITHOUT: -
+GitHub-generated README - GitHub-generated .gitignore - License
+
+This avoided creating a conflicting remote initial commit.
+
+Remote configured locally as:
+
+origin
+
+Remote repository: https://github.com/ded-recluse/ai-automation-ui.git
+
+Both branches were pushed to GitHub:
+
+main -> origin/main development -> origin/development
+
+Upstream tracking is configured for both branches.
+
+Intended branch usage:
+
+main - Stable application state.
+
+development - Ongoing integrated development.
+
+Future feature branches - May be used for isolated features as the
+project becomes more complex.
+
+===============================================================================
+COMPLETED — GITHUB AUTHENTICATION / SECURITY
+===============================================================================
+
+Initial GitHub push failed because password authentication is no longer
+supported for GitHub HTTPS Git operations.
+
+Git Credential Manager was already installed.
+
+Installed credential manager: git-credential-manager-core Version:
+2.0.394-beta+3fc6791abf
+
+Git was configured to use:
+
+credential.helper = manager-core
+
+GitHub authentication then succeeded.
+
+A second issue was discovered:
+
+http.sslVerify = false
+
+This had disabled TLS certificate verification globally.
+
+It was corrected to:
+
+http.sslVerify = true
+
+A subsequent push to GitHub completed successfully without the TLS
+security warning.
+
+===============================================================================
+CURRENT STATE — WHERE WE STOPPED
+===============================================================================
+
+The project is currently at its clean initial React + TypeScript
+baseline.
+
+Local repository: D:-repos-automation-ui
+
+Current working branch: development
+
+Remote: origin
+
+Remote branches: origin/main origin/development
+
+The starter application has been verified to run successfully.
+
+No custom application functionality has been written yet.
+
+The next session begins with the actual React application development.
+
+===============================================================================
+NEXT SESSION — IMMEDIATE STEPS
+===============================================================================
+
+1.  Open ai-automation-ui in the code editor.
+
+2.  Review the two primary React entry files:
+
+src/main.tsx src/App.tsx
+
+Goal: Understand how Vite starts React and how App becomes the root
+application component.
+
+3.  Review the existing starter CSS and assets.
+
+4.  Remove the Vite demonstration UI.
+
+5.  Establish the initial application shell for the AI automation
+    interface.
+
+6.  Make the first custom application commit on the development branch.
+
+===============================================================================
+GENERAL DEVELOPMENT ROADMAP
+===============================================================================
+
+The exact application requirements will be developed as the project
+evolves, but the general work remaining includes:
+
+PHASE 1 — FOUNDATION - Understand current React/Vite project
+structure. - Remove starter/demo content. - Establish application
+layout. - Establish component organization. - Establish TypeScript
+types/interfaces as needed. - Establish styling approach. - Establish
+development conventions.
+
+PHASE 2 — REACT APPLICATION STRUCTURE - Build reusable components. - Add
+application state where required. - Determine local vs shared/global
+state. - Introduce Context or another state solution only when actual
+application requirements justify it. - Add forms and user interaction. -
+Add navigation/routing if the application requires multiple views.
+
+PHASE 3 — AI AUTOMATION INTERFACE - Define what an automation/workflow
+represents in the UI. - Create workflow/automation management screens. -
+Create configuration controls. - Create prompt/input interfaces. -
+Display automation status and results. - Define frontend data models for
+automation workflows.
+
+PHASE 4 — BACKEND / AI INTEGRATION - Determine backend architecture. -
+Keep API credentials and secrets out of the browser. - Build API
+communication between React and the backend. - Connect AI services. -
+Add request/error/loading handling. - Add persistence/storage as
+required.
+
+PHASE 5 — WEB APPLICATION - Prepare production build. - Select
+hosting/deployment architecture. - Configure environment variables. -
+Deploy frontend and backend. - Configure production API access. - Test
+deployed application.
+
+PHASE 6 — QUALITY / PORTFOLIO - Improve README/documentation. - Add
+meaningful Git history throughout development. - Add testing where
+appropriate. - Add error handling and validation. - Refine UI/UX. -
+Document architecture and major design decisions. - Keep main stable
+while development continues through development/feature branches.
+
+===============================================================================
+WORKFLOW GOING FORWARD
+===============================================================================
+
+Normal development flow:
+
+1.  Work on development (or a feature branch when appropriate).
+2.  Make a focused change.
+3.  Run/test the application.
+4.  Review git status/diff.
+5.  Stage the intended files.
+6.  Commit with a descriptive message.
+7.  Push to GitHub.
+8.  Merge stable milestones into main when appropriate.
+
+The goal is not simply to have ChatGPT generate the finished
+application.
+
+The project is also being used to refresh and strengthen practical
+skills in: - React - TypeScript - Git - GitHub - npm - Vite -
+application architecture - AI/API integration
+
+===============================================================================
+END OF SESSION
+===============================================================================

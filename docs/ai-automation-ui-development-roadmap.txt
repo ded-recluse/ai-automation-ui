@@ -1,0 +1,280 @@
+AI AUTOMATION UI
+DEVELOPMENT ROADMAP
+
+Date: 2026-08-18
+Version: 0.1
+Status: Active
+
+===============================================================================
+CURRENT PROJECT STATE
+===============================================================================
+
+Project: ai-automation-ui
+
+Current foundation:
+
+- React + TypeScript project created with Vite
+- Dependencies installed
+- Development server verified
+- Production build verified
+- Git repository initialized
+- main branch established
+- development branch established
+- GitHub remote configured
+- Initial React/TypeScript baseline committed
+- Vite starter/demo UI removed
+- Vite/React starter assets removed
+- Initial application baseline established
+
+Current development focus:
+
+V1 Trading Journal Generator
+
+
+===============================================================================
+PHASE 1 — APPLICATION FOUNDATION
+===============================================================================
+
+Goal:
+Establish the basic React application structure for the journal generator.
+
+Planned work:
+
+- Create initial application shell.
+- Establish simple component organization.
+- Introduce predefined MES/MGC instrument configuration.
+- Establish Development / Live application mode concept.
+- Establish Manual / Mock data-source concept.
+- Keep state local unless application requirements justify shared/global state.
+- Maintain clean Git commits at logical milestones.
+
+
+===============================================================================
+PHASE 2 — DAILY JOURNAL INPUT UI
+===============================================================================
+
+Goal:
+Collect all information required to generate the daily journal.
+
+Planned interface:
+
+Instrument selector:
+- MGC
+- MES
+
+Daily levels:
+- PDH
+- PDL
+- ONH
+- ONL
+- Settlement
+
+Chart inputs:
+- 15-minute marked-up chart
+- 1-hour marked-up chart
+- 4-hour marked-up chart
+
+Additional work:
+
+- Input validation
+- Clear form state
+- Instrument-specific configuration loading
+- Development-mode visibility where useful
+
+
+===============================================================================
+PHASE 3 — MOCK DATA / DEVELOPMENT SUPPORT
+===============================================================================
+
+Goal:
+Create a repeatable environment for application development and validation.
+
+Planned work:
+
+- Define standardized internal daily market-data types.
+- Add Mock data source.
+- Create known MES/MGC test scenarios.
+- Allow repeated testing against identical inputs.
+- Add useful Development-mode diagnostics.
+- Keep development controls out of Live mode.
+
+
+===============================================================================
+PHASE 4 — JOURNAL GENERATION
+===============================================================================
+
+Goal:
+Generate the actual daily trading journal.
+
+Planned work:
+
+- Define journal-generation request structure.
+- Define frontend/backend boundary.
+- Build backend endpoint.
+- Integrate AI service.
+- Keep API credentials outside React.
+- Supply instrument configuration.
+- Supply structured daily levels.
+- Supply chart images.
+- Supply existing trading framework/rules.
+- Display generated journal.
+- Add loading/error handling.
+- Validate generated output against the established framework.
+
+
+===============================================================================
+PHASE 5 — JOURNAL USABILITY / PERSISTENCE
+===============================================================================
+
+Goal:
+Make generated journals practical for normal daily use.
+
+Potential work, to be defined as requirements become clear:
+
+- Journal review/editing
+- Saving journals
+- Journal history
+- Exporting journals
+- Improved validation
+- UI refinement
+
+Do not implement these features until their exact requirements are established.
+
+
+===============================================================================
+DEFERRED INVESTIGATION — REAL-TIME MARKET DATA
+===============================================================================
+
+This is an important future feasibility investigation but is NOT a V1 blocker.
+
+Research must determine the lowest-cost legitimate programmatic futures data
+solution meeting the application's actual requirements.
+
+Investigate:
+
+- Webull OpenAPI
+- CME data/API options
+- Databento
+- Other suitable providers
+
+Evaluate:
+
+- MES availability
+- MGC availability
+- Real-time data
+- Historical data
+- OHLCV/bar data
+- Settlement information
+- Licensing
+- Nonprofessional/personal-use eligibility
+- CME/COMEX fees
+- Monthly cost
+- Reliability
+- Documentation
+- Streaming support
+
+Avoid paying for Level 2, order-book, footprint, or other data unless future
+requirements actually need it.
+
+
+===============================================================================
+FUTURE PHASE — LIVE MARKET DATA
+===============================================================================
+
+Only proceed if real-time market data is financially and technically feasible.
+
+Planned concepts:
+
+- Implement Live API data source.
+- Implement provider adapter.
+- Preserve standardized internal data structures.
+- Automate daily level acquisition/calculation where reliable.
+- Preserve Manual mode as fallback where appropriate.
+
+
+===============================================================================
+FUTURE PHASE — NATIVE LIVE CHARTING
+===============================================================================
+
+Potential work:
+
+- Live candlestick chart
+- EMA 9 / EMA 21
+- MACD
+- Volume
+- PDH / PDL
+- ONH / ONL
+- Settlement
+- Setup annotations
+- Entry / Stop / Target visualization
+- Instrument tabs
+
+Important principle:
+
+The chart and rules engine should use the same underlying market data.
+
+
+===============================================================================
+FUTURE PHASE — RULES ENGINE / ALERTS
+===============================================================================
+
+Potential work:
+
+- Evaluate existing trading framework programmatically.
+- Detect valid setups.
+- Validate entries.
+- Generate BUY alerts.
+- Generate SELL alerts.
+- Preserve instrument-specific behavior through configuration.
+- Validate engine results against known historical sessions.
+
+
+===============================================================================
+FUTURE PHASE — SMS NOTIFICATIONS
+===============================================================================
+
+Potential work:
+
+- Select notification/SMS provider.
+- Define alert message format.
+- Send validated BUY/SELL alerts.
+- Add notification status/error handling.
+
+This phase depends on a reliable rules engine and viable real-time market data.
+
+
+===============================================================================
+OUT OF CURRENT SCOPE
+===============================================================================
+
+The following is not currently planned:
+
+- Automated brokerage order execution
+
+The future automation concept is alert-only. Trade execution remains under user
+control.
+
+
+===============================================================================
+IMMEDIATE NEXT STEP
+===============================================================================
+
+Return to React development.
+
+Next objective:
+
+Build the initial V1 application shell around the Trading Journal Generator,
+then begin the instrument selection and daily journal input interface.
+
+Work incrementally:
+
+1. Make one focused change.
+2. Run/test the application.
+3. Review Git status/diff.
+4. Commit logical milestones.
+5. Push development branch.
+6. Merge stable milestones to main when appropriate.
+
+===============================================================================
+END OF ROADMAP
+===============================================================================

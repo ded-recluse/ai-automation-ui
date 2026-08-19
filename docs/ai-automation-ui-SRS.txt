@@ -1,0 +1,240 @@
+AI AUTOMATION UI
+SOFTWARE REQUIREMENTS SPECIFICATION (SRS)
+
+Date: 2026-08-18
+Version: 0.1
+Status: Draft
+
+===============================================================================
+1. PURPOSE
+===============================================================================
+
+The initial application will be a trading journal generator focused on futures
+trading.
+
+The first supported instruments are:
+
+- MES — Micro E-mini S&P 500 Futures
+- MGC — Micro Gold Futures
+
+The application will automate generation of the user's daily trading journal
+using structured daily market levels, instrument configuration, marked-up chart
+screenshots, and the user's existing trading framework.
+
+Real-time market monitoring and trade alerts are future capabilities and are not
+required for V1.
+
+
+===============================================================================
+2. V1 SCOPE
+===============================================================================
+
+V1 must allow the user to:
+
+1. Select a supported instrument.
+2. Enter daily market levels.
+3. Upload marked-up chart screenshots.
+4. Generate a daily trading journal.
+5. Review the generated journal.
+
+Initial supported instruments:
+
+- MES
+- MGC
+
+Required daily level inputs:
+
+- PDH
+- PDL
+- ONH
+- ONL
+- Settlement
+
+Required chart inputs:
+
+- 15-minute chart
+- 1-hour chart
+- 4-hour chart
+
+The chart screenshots may be the same marked-up charts prepared by the user for
+daily trading.
+
+
+===============================================================================
+3. JOURNAL GENERATION REQUIREMENTS
+===============================================================================
+
+The journal generator must use:
+
+- Selected instrument
+- Instrument configuration
+- PDH
+- PDL
+- ONH
+- ONL
+- Settlement
+- 15-minute chart
+- 1-hour chart
+- 4-hour chart
+- Existing trading framework/rules
+
+The entered numerical market levels are authoritative structured values even
+when the same levels appear visually on uploaded charts.
+
+The application must identify chart timeframe by the upload field rather than
+requiring AI to infer whether an image is 15m, 1h, or 4h.
+
+The journal analysis must apply the existing trading framework consistently and
+must not introduce new trading criteria during analysis.
+
+
+===============================================================================
+4. INSTRUMENT REQUIREMENTS
+===============================================================================
+
+MES and MGC must be available as predefined instruments.
+
+Each instrument must be capable of having its own configuration, including as
+needed:
+
+- Symbol
+- Name
+- Exchange
+- Tick size
+- Tick value
+- Time zone
+- Session definitions
+- Settlement configuration
+
+The user should not need to enter static instrument/session configuration during
+normal daily journal preparation.
+
+The user will enter the daily Settlement price in V1.
+
+The design must allow additional instruments to be added in the future without
+changing the behavior of existing instruments.
+
+
+===============================================================================
+5. APPLICATION MODES
+===============================================================================
+
+The application must distinguish between:
+
+- Development mode
+- Live mode
+
+Application mode must be independent of the selected market-data source.
+
+Development mode may expose diagnostic and testing information.
+
+Live mode should present only the information needed for normal application use.
+
+
+===============================================================================
+6. DATA SOURCE REQUIREMENTS
+===============================================================================
+
+The application must distinguish between market-data sources.
+
+Planned sources:
+
+- Manual
+- Mock
+- Live API (future)
+
+V1 normal operation will use Manual data.
+
+Mock data will support development and repeatable testing.
+
+Live API data is deferred until a financially and technically suitable futures
+market-data provider is identified.
+
+Application mode and data source must remain separate concepts.
+
+
+===============================================================================
+7. DEVELOPMENT / TESTING REQUIREMENTS
+===============================================================================
+
+Development mode may provide access to:
+
+- Loaded instrument configuration
+- Current data source
+- Raw journal request
+- Raw AI response
+- Validation errors
+- API status
+- Detailed errors
+- Mock test scenarios
+- Intermediate/calculated values
+
+Mock data should support repeatable known MES/MGC scenarios.
+
+The same test scenario should be reusable after code changes to help validate
+that existing behavior has not unintentionally changed.
+
+
+===============================================================================
+8. FUTURE REQUIREMENTS — NOT V1
+===============================================================================
+
+The following capabilities are explicitly deferred:
+
+- Real-time futures market-data integration
+- Automatic PDH calculation
+- Automatic PDL calculation
+- Automatic ONH calculation
+- Automatic ONL calculation
+- Automatic Settlement retrieval/calculation
+- Native live charting
+- Real-time rules evaluation
+- BUY alerts
+- SELL alerts
+- SMS notifications
+- Historical market replay
+- Add Instrument user interface
+
+Automated brokerage order execution is not currently part of project scope.
+
+Future trade automation is intended to produce alerts only. The user remains
+responsible for placing trades.
+
+
+===============================================================================
+9. SECURITY REQUIREMENTS
+===============================================================================
+
+AI/API credentials and other secrets must not be stored in or exposed by the
+React browser application.
+
+Future external API communication requiring credentials must be handled through
+an appropriate backend service.
+
+
+===============================================================================
+10. REAL-TIME DATA FEASIBILITY REQUIREMENT
+===============================================================================
+
+Before implementing real-time futures functionality, available providers must be
+evaluated for:
+
+- MES support
+- MGC support
+- Real-time availability
+- Historical availability
+- OHLCV/bar intervals
+- Settlement data availability
+- API access
+- Personal/nonprofessional licensing
+- CME/COMEX fees
+- Monthly cost
+- Reliability
+- Documentation quality
+- Streaming support if required
+
+Real-time integration must not block development of the V1 journal generator.
+
+===============================================================================
+END OF SRS
+===============================================================================
