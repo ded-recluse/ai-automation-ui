@@ -1,0 +1,372 @@
+AI AUTOMATION UI — DEVELOPMENT SESSION SUMMARY
+Date: 2026-09-03
+Session: 003
+Status: IN PROGRESS
+
+===============================================================================
+SESSION OBJECTIVE
+===============================================================================
+
+Resume development from Session 002 and begin implementing the first functional
+pieces of the V1 Trading Journal Generator.
+
+Primary focus:
+
+- Verify repository state
+- Establish static instrument configuration
+- Establish daily market-data structure
+- Begin instrument-selection UI
+- Begin daily-level input UI
+
+===============================================================================
+COMPLETED — PROJECT / GIT VERIFICATION
+===============================================================================
+
+Current working branch:
+
+development
+
+Verified:
+
+- development tracks origin/development
+- branch was up to date with origin/development
+- working tree was clean
+- Session 002 documentation had already been committed and pushed
+
+The previous Session 002 summary contained an outdated stopping point stating
+that docs/ was still untracked. Repository status confirmed that this work had
+already been completed.
+
+===============================================================================
+COMPLETED — STATIC INSTRUMENT CONFIGURATION
+===============================================================================
+
+Created:
+
+src/config/instruments.ts
+
+Created the InstrumentConfig type containing:
+
+- symbol
+- name
+- exchange
+- tickSize
+- tickValue
+- timeZone
+
+Preconfigured instruments:
+
+MES
+- Micro E-mini S&P 500
+- CME
+- Tick size: 0.25
+- Tick value: $1.25
+- Time zone: America/Chicago
+
+MGC
+- Micro Gold
+- COMEX
+- Tick size: 0.1
+- Tick value: $1.00
+- Time zone: America/Chicago
+
+This establishes static instrument configuration separately from daily market
+data.
+
+Session and settlement-time configuration were intentionally NOT added yet
+because those definitions still need to be verified before being finalized.
+
+===============================================================================
+COMPLETED — DAILY MARKET DATA TYPE
+===============================================================================
+
+Created:
+
+src/types/marketData.ts
+
+Created DailyMarketData containing:
+
+- date
+- instrument
+- pdh
+- pdl
+- onh
+- onl
+- settlement
+
+This data structure represents information that changes each trading day.
+
+Static instrument information and daily market information are therefore now
+separate application concepts.
+
+The instrument property currently uses:
+
+string
+
+This avoids creating a second hardcoded MES/MGC source of truth while the
+application is intended to support additional configured instruments later.
+
+===============================================================================
+COMPLETED — BUILD VERIFICATION
+===============================================================================
+
+Production builds were run during development using:
+
+npm run build
+
+The TypeScript/Vite builds completed successfully after creation of the
+instrument configuration and daily market-data type.
+
+===============================================================================
+ISSUE FOUND — CONFIG DIRECTORY LOCATION
+===============================================================================
+
+The config directory was initially created at the repository root:
+
+config/instruments.ts
+
+This caused Vite to fail when App.tsx attempted to import:
+
+./config/instruments
+
+because App.tsx is located inside src/.
+
+The directory was moved to the correct location:
+
+src/config/instruments.ts
+
+Final relevant source structure:
+
+src/
+├── config/
+│   └── instruments.ts
+├── types/
+│   └── marketData.ts
+├── assets/
+├── App.css
+├── App.tsx
+├── index.css
+└── main.tsx
+
+After moving the configuration file, Vite successfully resolved the import.
+
+===============================================================================
+COMPLETED — INSTRUMENT SELECTION UI
+===============================================================================
+
+App.tsx now imports the configured instrument collection.
+
+The interface dynamically generates instrument buttons from the configuration
+rather than hardcoding MES and MGC directly into the UI.
+
+Current instrument choices:
+
+[MES] [MGC]
+
+React useState was added to track the selected instrument.
+
+Current initial selection:
+
+MES
+
+Clicking MES or MGC updates the selectedInstrument state.
+
+A temporary UI display currently shows:
+
+Selected: MES
+
+or:
+
+Selected: MGC
+
+This is currently useful for verifying state behavior and may be removed or
+replaced when the interface is styled.
+
+===============================================================================
+COMPLETED — DAILY LEVEL INPUT SHELL
+===============================================================================
+
+Added the initial Daily Levels section to App.tsx.
+
+Current inputs:
+
+- PDH
+- PDL
+- ONH
+- ONL
+- Settlement
+
+The controls currently render as basic unstyled HTML number inputs.
+
+No final styling has been applied.
+
+The UI is intentionally functional/structural at this stage rather than
+presentation-focused.
+
+===============================================================================
+STARTED — DAILY MARKET DATA STATE
+===============================================================================
+
+App.tsx now imports:
+
+DailyMarketData
+
+A marketData React state object was started using:
+
+useState<DailyMarketData>
+
+Initial fields:
+
+- date
+- instrument
+- pdh
+- pdl
+- onh
+- onl
+- settlement
+
+The date is initialized from the current date.
+
+The initial instrument is MES.
+
+Daily numerical levels currently initialize to 0.
+
+IMPORTANT:
+
+The visible Daily Levels input controls have NOT yet been wired to marketData
+state.
+
+This is the exact development point where Session 003 stopped.
+
+===============================================================================
+CURRENT UI STATE
+===============================================================================
+
+The application currently displays approximately:
+
+Trading Journal Generator
+
+Instrument
+
+Selected: MES
+
+[MES] [MGC]
+
+Daily Levels
+
+PDH [ ]
+PDL [ ]
+ONH [ ]
+ONL [ ]
+Settlement [ ]
+
+Instrument selection works.
+
+Daily level controls render but are not yet connected to application state.
+
+Styling remains intentionally minimal.
+
+===============================================================================
+DESIGN PRINCIPLES MAINTAINED
+===============================================================================
+
+Static instrument configuration remains separate from daily market data.
+
+Instrument UI is generated from configuration rather than hardcoded.
+
+The application is being built incrementally with build/runtime verification
+before adding additional behavior.
+
+No real-time market-data integration has been introduced.
+
+No trading rules have been implemented in the UI yet.
+
+No AI journal-generation integration has been implemented yet.
+
+===============================================================================
+IMMEDIATE NEXT STEPS
+===============================================================================
+
+1. Resume with the existing App.tsx.
+
+2. Wire the PDH input to marketData state first.
+
+3. Verify that editing PDH correctly updates marketData.
+
+4. Apply the same controlled-input pattern to:
+
+   - PDL
+   - ONH
+   - ONL
+   - Settlement
+
+5. Synchronize marketData.instrument with selectedInstrument.
+
+6. Verify MES/MGC switching behavior.
+
+7. Run:
+
+   npm run build
+
+8. Continue the V1 application shell after the daily-level state is working.
+
+===============================================================================
+UPCOMING V1 WORK
+===============================================================================
+
+After daily-level state is functional:
+
+- Add 15-minute chart upload
+- Add 1-hour chart upload
+- Add 4-hour chart upload
+- Add Development / Live application mode concept
+- Add Manual / Mock data-source concept
+- Establish journal-generation request structure
+- Add journal generation UI when the input model is ready
+
+Do not implement yet:
+
+- Real-time market-data integration
+- Native live charting
+- BUY/SELL alerts
+- SMS notifications
+- Automated brokerage execution
+
+===============================================================================
+JOURNAL OUTPUT NOTE
+===============================================================================
+
+During normal trading use, it was determined that the current AI-generated
+journal analysis is more verbose than necessary.
+
+Future journal-generation output should be substantially condensed and focused
+on execution-relevant information.
+
+This is an output/presentation requirement.
+
+It does NOT change the existing trading framework or trading rules.
+
+The journal-generation prompt/output format should be reviewed later rather
+than changing trading criteria during application development.
+
+===============================================================================
+NEXT DEVELOPMENT OBJECTIVE
+===============================================================================
+
+Complete controlled Daily Levels state management, beginning with PDH.
+
+The exact next implementation step is:
+
+Connect the PDH input value to:
+
+marketData.pdh
+
+and update it through:
+
+setMarketData
+
+Verify that behavior before wiring the remaining fields.
+
+===============================================================================
+END OF SESSION 003
+===============================================================================
