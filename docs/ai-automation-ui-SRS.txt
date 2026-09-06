@@ -1,8 +1,8 @@
 AI AUTOMATION UI
 SOFTWARE REQUIREMENTS SPECIFICATION (SRS)
 
-Date: 2026-08-18
-Version: 0.1
+Date: 2026-09-06
+Version: 0.2
 Status: Draft
 
 ===============================================================================
@@ -33,9 +33,10 @@ V1 must allow the user to:
 
 1. Select a supported instrument.
 2. Enter daily market levels.
-3. Upload marked-up chart screenshots.
-4. Generate a daily trading journal.
-5. Review the generated journal.
+3. Add and upload marked-up chart screenshots as needed.
+4. Assign a timeframe to each chart screenshot.
+5. Generate a daily trading journal.
+6. Review the generated journal.
 
 Initial supported instruments:
 
@@ -50,11 +51,17 @@ Required daily level inputs:
 - ONL
 - Settlement
 
-Required chart inputs:
+Chart inputs are dynamic. The user may add only the chart screenshots needed
+for a journal rather than being required to populate a fixed set of chart
+upload fields.
 
-- 15-minute chart
-- 1-hour chart
-- 4-hour chart
+Initial standard chart timeframe options:
+
+- 5-minute
+- 15-minute
+- 1-hour
+- 4-hour
+- Daily
 
 The chart screenshots may be the same marked-up charts prepared by the user for
 daily trading.
@@ -73,16 +80,14 @@ The journal generator must use:
 - ONH
 - ONL
 - Settlement
-- 15-minute chart
-- 1-hour chart
-- 4-hour chart
+- User-supplied chart screenshots and their assigned timeframes
 - Existing trading framework/rules
 
 The entered numerical market levels are authoritative structured values even
 when the same levels appear visually on uploaded charts.
 
-The application must identify chart timeframe by the upload field rather than
-requiring AI to infer whether an image is 15m, 1h, or 4h.
+The application must identify each chart's timeframe from the timeframe assigned
+to that chart rather than requiring AI to infer the timeframe from the image.
 
 The journal analysis must apply the existing trading framework consistently and
 must not introduce new trading criteria during analysis.
@@ -165,6 +170,7 @@ Development mode may provide access to:
 - Raw AI response
 - Validation errors
 - API status
+- API usage and estimated request cost
 - Detailed errors
 - Mock test scenarios
 - Intermediate/calculated values
@@ -194,6 +200,10 @@ The following capabilities are explicitly deferred:
 - SMS notifications
 - Historical market replay
 - Add Instrument user interface
+- User-defined/custom chart timeframes
+- Persistent custom chart timeframe configuration
+- Persistent storage of chart images
+- Persistent/searchable journal history
 
 Automated brokerage order execution is not currently part of project scope.
 
@@ -202,14 +212,37 @@ responsible for placing trades.
 
 
 ===============================================================================
-9. SECURITY REQUIREMENTS
+9. API SECURITY AND COST CONTROL REQUIREMENTS
 ===============================================================================
 
 AI/API credentials and other secrets must not be stored in or exposed by the
 React browser application.
 
-Future external API communication requiring credentials must be handled through
-an appropriate backend service.
+External API communication requiring credentials must be handled through an
+appropriate backend service.
+
+API usage must include safeguards against unexpected or excessive costs.
+
+The application must:
+
+- Use provider-level project/account spending limits when available.
+- Prevent accidental duplicate or concurrent journal-generation requests.
+- Avoid automatic retries that could unintentionally create additional
+  billable API requests.
+- Handle API quota, budget, and rate-limit failures cleanly.
+- Track API usage information needed to estimate the cost of each journal
+  generation.
+
+Development mode should expose API usage diagnostics when available, including:
+
+- AI model used
+- Input token usage
+- Output token usage
+- Number of chart images submitted
+- Estimated request cost
+
+API usage and cost must be measured during development before AI journal
+generation is considered ready for Live mode.
 
 
 ===============================================================================
