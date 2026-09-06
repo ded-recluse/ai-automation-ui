@@ -2,6 +2,8 @@ import { useState } from 'react'
 import './App.css'
 import { instruments } from './config/instruments'
 import type { DailyMarketData } from './types/marketData'
+import type { ChartData } from './types/chartData'
+import ChartUpload from './components/ChartUpload'
 
 function App() {
 
@@ -14,7 +16,26 @@ function App() {
     onl: 0,
     settlement: 0
   })
-  
+
+  const [chartData, setChartData] = useState<ChartData[]>([
+    { timeframe: '5m', file: null },
+    { timeframe: '15m', file: null },
+    { timeframe: '1h', file: null },
+    { timeframe: '4h', file: null }, 
+    { timeframe: '1d', file: null }
+  ])
+
+  const handleFileChange = (
+    timeframe: ChartData['timeframe'],
+    file: File | null
+  ) => {
+    setChartData(
+      chartData.map((chart) =>
+        chart.timeframe === timeframe ? { ...chart, file } : chart
+      ),
+    )
+  }
+    
   return (
     <main>
       <h1>Trading Journal Generator</h1>
@@ -104,6 +125,18 @@ function App() {
               />
             </label>
           </section>
+
+          <section>
+            <h2>Charts</h2>
+            {chartData.map((chart) => (
+              <ChartUpload
+                key={chart.timeframe}
+                timeframe={chart.timeframe}
+                file={chart.file}
+                onFileChange={handleFileChange}
+              />
+            ))}
+          </section>  
         </div>
       </section>
     </main>
