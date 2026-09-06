@@ -1,0 +1,501 @@
+AI AUTOMATION UI — DEVELOPMENT SESSION SUMMARY
+Date: 2026-09-06
+Session: 004
+Status: COMPLETE
+
+===============================================================================
+SESSION OBJECTIVE
+===============================================================================
+
+Resume development from Session 003 at the exact stopping point:
+
+- Complete controlled Daily Levels state management
+- Synchronize instrument selection with daily market data
+- Verify production build
+- Begin chart-image input functionality for the V1 Trading Journal Generator
+
+===============================================================================
+COMPLETED — DAILY LEVEL STATE MANAGEMENT
+===============================================================================
+
+Completed controlled React state wiring for all Daily Levels fields:
+
+- PDH
+- PDL
+- ONH
+- ONL
+- Settlement
+
+Each input now:
+
+- Reads its value from marketData
+- Updates the corresponding marketData property through setMarketData
+- Selects the entire existing value when the field receives focus
+
+Select-on-focus was added because numerical fields currently initialize to 0.
+This allows the user to click a field and immediately type a replacement value
+without manually selecting or deleting the existing zero.
+
+PDH was wired and tested first before applying the same pattern to the remaining
+fields.
+
+===============================================================================
+COMPLETED — INSTRUMENT STATE CLEANUP
+===============================================================================
+
+The application previously contained two sources of instrument state:
+
+- selectedInstrument
+- marketData.instrument
+
+The redundant selectedInstrument state was removed.
+
+marketData.instrument is now the single source of truth for the selected
+instrument.
+
+The instrument buttons generated from the static instrument configuration now
+update:
+
+marketData.instrument
+
+Verified:
+
+- MES selection updates marketData.instrument to MES
+- MGC selection updates marketData.instrument to MGC
+- Changing instruments does not disturb the existing Daily Levels values
+
+===============================================================================
+COMPLETED — BUILD / GIT CHECKPOINT
+===============================================================================
+
+A production build was run after completing Daily Levels and instrument-state
+work:
+
+npm run build
+
+Result:
+
+- TypeScript compilation passed
+- Vite production build passed
+- No build errors
+
+The completed daily-market-data work was committed to the development branch.
+
+Commit:
+
+13a8cf2 — Add daily market data input state
+
+The commit was pushed to origin/development.
+
+===============================================================================
+REQUIREMENT UPDATE — CHART TIMEFRAMES
+===============================================================================
+
+The previous V1 plan listed chart uploads for:
+
+- 15-minute
+- 1-hour
+- 4-hour
+
+During Session 004, the required chart set was expanded to include:
+
+- 5-minute
+- 15-minute
+- 1-hour
+- 4-hour
+- Daily
+
+Rationale:
+
+- 5m supports lower-timeframe execution / stop refinement
+- 15m is the primary execution structure
+- 1h provides intraday context
+- 4h provides higher-timeframe structure
+- Daily provides broader market context
+
+===============================================================================
+COMPLETED — CHART DATA TYPE
+===============================================================================
+
+Created:
+
+src/types/chartData.ts
+
+Current types establish:
+
+ChartTimeframe
+
+with the currently recognized values:
+
+- 5m
+- 15m
+- 1h
+- 4h
+- 1d
+
+and:
+
+ChartData
+
+containing:
+
+- timeframe
+- file
+
+The file property is:
+
+File | null
+
+The ChartTimeframe type name was standardized to PascalCase during development.
+
+IMPORTANT:
+
+The fixed ChartTimeframe union is expected to be revisited later if custom
+user-defined timeframes are implemented.
+
+===============================================================================
+COMPLETED — CHART DATA STATE
+===============================================================================
+
+App.tsx now contains chartData state using:
+
+useState<ChartData[]>
+
+The current implementation initializes five chart records:
+
+- 5m
+- 15m
+- 1h
+- 4h
+- 1d
+
+App.tsx owns chartData and setChartData.
+
+A handleChartFileChange function updates the file associated with a specific
+timeframe without changing the other chart records.
+
+===============================================================================
+COMPLETED — REUSABLE CHART UPLOAD COMPONENT
+===============================================================================
+
+Created:
+
+src/components/ChartUpload.tsx
+
+Chart upload behavior was moved out of App.tsx into the reusable ChartUpload
+component.
+
+The component receives:
+
+- timeframe
+- file
+- onFileChange
+
+App.tsx remains responsible for owning the actual chart state.
+
+===============================================================================
+COMPLETED — CHART IMAGE INPUT METHODS
+===============================================================================
+
+ChartUpload currently supports multiple ways of supplying an image.
+
+Browse / Replace:
+
+- A hidden native file input accepts image files
+- A custom Browse button triggers the file picker
+- Once a file exists, the control can display Replace instead of Browse
+
+Drag and Drop:
+
+- Each chart upload area acts as a drop target
+- Dropped files are validated as image files
+- The selected image is assigned to the correct timeframe
+
+Clipboard Paste:
+
+- Chart upload areas are focusable
+- The user can click a specific chart slot and press Ctrl+V
+- Clipboard image data is assigned to the focused chart slot
+- This prevents ambiguity about which timeframe should receive the pasted image
+
+Remove:
+
+- A populated chart can be returned to a null file state
+- Existing state/update behavior handles removal without additional chart state
+
+===============================================================================
+COMPLETED — IMAGE PREVIEW
+===============================================================================
+
+ChartUpload displays a preview of the selected image.
+
+The component uses:
+
+URL.createObjectURL(file)
+
+to create a temporary browser URL that can be used as an image source.
+
+A useEffect watches the file dependency.
+
+When the file changes:
+
+- A new object URL is created
+- previewUrl is updated
+- React renders the new image
+
+The effect cleanup uses:
+
+URL.revokeObjectURL(objectUrl)
+
+to release the previous temporary browser resource when the file changes or the
+component is removed.
+
+The component also displays the selected filename.
+
+===============================================================================
+COMPLETED — BASIC CHART UPLOAD STYLING
+===============================================================================
+
+App.css now includes basic chart-upload styling.
+
+The upload area was given visible dimensions and a dashed boundary so that the
+drag-and-drop target is obvious and usable.
+
+A chart-preview style was added so selected images render within the upload
+area.
+
+Styling remains functional rather than final.
+
+===============================================================================
+DESIGN DECISION — DYNAMIC CHART SLOTS
+===============================================================================
+
+At the end of Session 004, the five permanently rendered chart boxes were
+reconsidered.
+
+Decision:
+
+The application should NOT require five static chart upload boxes.
+
+Instead, the Charts interface should allow the user to add only the chart slots
+needed for a particular journal session.
+
+Target concept:
+
+Charts
+
+[ + Add Chart ]
+
+Each added chart should contain:
+
+- Timeframe selector
+- Browse / Replace
+- Drag and drop
+- Focused Ctrl+V paste
+- Image preview
+- Remove
+
+The user should be able to have:
+
+- Zero charts
+- One chart
+- Several charts
+- All standard timeframes
+
+without unused permanent chart boxes occupying the interface.
+
+The existing ChartUpload component remains useful. The primary change will be
+how App.tsx creates and manages ChartData records.
+
+===============================================================================
+LATER / ARCHITECTURE TODO
+===============================================================================
+
+Do NOT implement these as part of the immediate dynamic-chart change.
+
+Custom Timeframes:
+
+Allow users to define additional chart timeframes beyond the initial defaults.
+
+Examples could include:
+
+- 30m
+- 2h
+- Other user-defined intervals
+
+Persistent Configuration:
+
+Investigate lightweight V1 configuration persistence using browser localStorage.
+
+Potential persisted configuration may eventually include:
+
+- Custom chart timeframes
+- Configured instruments
+- Application mode
+- Data-source preferences
+- Other user preferences/configuration
+
+Current Journal Session:
+
+Daily market data and chart images currently remain application/session state.
+
+Chart Image Persistence:
+
+Do NOT plan to store chart-image binary data in localStorage.
+
+If permanent chart/journal image history is later required, use storage suited
+for larger/binary data, such as IndexedDB or a future backend/database.
+
+Journal History:
+
+Determine later whether generated journals should be persisted and whether the
+application needs searchable journal history.
+
+===============================================================================
+CURRENT SOURCE STRUCTURE — RELEVANT FILES
+===============================================================================
+
+src/
+├── components/
+│   └── ChartUpload.tsx
+├── config/
+│   └── instruments.ts
+├── types/
+│   ├── chartData.ts
+│   └── marketData.ts
+├── App.css
+├── App.tsx
+├── index.css
+└── main.tsx
+
+===============================================================================
+CURRENT APPLICATION STATE
+===============================================================================
+
+The application currently provides:
+
+Instrument selection:
+
+- Generated dynamically from instrument configuration
+- marketData.instrument is the single source of truth
+
+Daily Levels:
+
+- PDH
+- PDL
+- ONH
+- ONL
+- Settlement
+- Controlled through marketData
+- Select-all-on-focus behavior
+
+Charts:
+
+- Five chart records currently initialized in chartData
+- Reusable ChartUpload component
+- Browse / Replace
+- Drag and drop
+- Clipboard paste
+- Preview
+- Filename
+- Remove
+
+The current five static chart slots are temporary and are the next area to
+change.
+
+===============================================================================
+GIT / SESSION END STATE
+===============================================================================
+
+Session 004 application changes were:
+
+- Production-build verified
+- Staged
+- Committed
+- Pushed to origin/development
+
+The working development branch is the branch to resume from in Session 005.
+
+===============================================================================
+SESSION 005 — IMMEDIATE OBJECTIVE
+===============================================================================
+
+Replace the five static chart records / upload boxes with dynamic chart
+creation.
+
+Do this incrementally.
+
+Planned sequence:
+
+1. Review current App.tsx and ChartUpload.tsx before modifying them.
+
+2. Change chartData initialization so the application does not automatically
+   create five permanent chart slots.
+
+3. Add a:
+
+   + Add Chart
+
+   control to the Charts section.
+
+4. Determine the minimum ChartData model change required for a newly created
+   chart that does not yet have a selected timeframe.
+
+5. Add a timeframe selector to each dynamically created chart slot.
+
+6. Initially support the standard timeframe options:
+
+   - 5m
+   - 15m
+   - 1h
+   - 4h
+   - Daily
+
+7. Preserve the already-working ChartUpload behavior:
+
+   - Browse / Replace
+   - Drag and drop
+   - Ctrl+V paste into focused slot
+   - Image preview
+   - Remove
+
+8. Verify that adding/removing one chart does not affect other chart records.
+
+9. Run:
+
+   npm run build
+
+10. Create a Git checkpoint after the dynamic-chart functionality is verified.
+
+===============================================================================
+DO NOT IMPLEMENT YET
+===============================================================================
+
+- Custom timeframe persistence
+- localStorage configuration persistence
+- Permanent chart-image storage
+- Journal history database
+- Real-time market-data integration
+- Native live charting
+- BUY/SELL alerts
+- SMS notifications
+- Automated brokerage execution
+
+===============================================================================
+EXACT NEXT DEVELOPMENT STEP
+===============================================================================
+
+Resume from the current chartData implementation.
+
+Before changing code, inspect the current versions of:
+
+src/App.tsx
+src/components/ChartUpload.tsx
+src/types/chartData.ts
+
+Then begin converting chartData from five preinitialized records to dynamic
+user-created chart slots.
+
+===============================================================================
+END OF SESSION 004 / HANDOFF TO SESSION 005
+===============================================================================
